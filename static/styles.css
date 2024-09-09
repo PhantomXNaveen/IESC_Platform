@@ -1,0 +1,70 @@
+*{
+    margin: 0px;
+}
+
+h2{
+    text-align: center;
+    font-weight: bolder;
+}
+#container, #panel{
+    border: 2px solid black;
+}
+
+#panel{
+    width: 90%;
+    margin: auto;
+    height: 900px;
+}
+
+
+#input-form{
+    border:1px solid blue;
+    width: 60%;
+    margin: auto;
+    margin-top: 40px;
+    border-radius: 10px;
+    padding: 8px;
+    font-style: initial;
+    
+}
+
+#in-form{
+    border:1px solid blue;
+    width: 50%;
+    margin: auto;
+    margin-top: 150px;
+    border-radius: 20px;
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+}
+
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px; /* Padding to the left and right */
+}
+
+.add-text {
+  flex: 1;
+  text-align: center;
+}
+
+.profile-card {
+    display: flex;
+    align-items: center;
+}
+.profile-img {
+    margin-right: 8rem; /* Space between image and content */
+}
+.profile-img img {
+    width: 150px; /* Adjust image size as needed */
+    height: auto; /* Maintain aspect ratio */
+    border-radius: 50%; /* Circular image */
+}
+.profile-content {
+    max-width: 600px; /* Limit content width */
+}
+

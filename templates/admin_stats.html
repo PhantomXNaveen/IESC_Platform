@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- External styles -->
+    <link rel="stylesheet" href="/static/styles.css">
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Admin Dashboard</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand">Admin's Dashboard</a>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" aria-current="page" href="{{ url_for('admin_dashboard') }}">Info</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_find') }}">Find</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_stats') }}">Stats</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            <!-- Sponsors Pie Chart -->
+            <div class="col-lg-4 mb-4">
+                <h2>Sponsors</h2>
+                <canvas id="sponsorsPieChart"></canvas>
+            </div>
+
+            <!-- Influencers Pie Chart -->
+            <div class="col-lg-4 mb-4">
+                <h2>Influencers</h2>
+                <canvas id="influencersPieChart"></canvas>
+            </div>
+
+            <!-- Campaigns Pie Chart -->
+            <div class="col-lg-4 mb-4">
+                <h2>Campaigns</h2>
+                <canvas id="campaignsPieChart"></canvas>
+            </div>
+        </div>
+
+        <br><br>
+
+        <!-- Overview Section -->
+        <h2>Overview</h2>
+        <div class="row mb-4">
+            <div class="col-12">
+                <canvas id="campaignsBarChart"></canvas>
+            </div>
+        </div>
+        <div class="row mb-4">
+            <div class="col-12">
+                <canvas id="influencersBarChart"></canvas>
+            </div>
+        </div>
+        <div class="row mb-4">
+            <div class="col-12">
+                <canvas id="sponsorsBarChart"></canvas>
+            </div>
+        </div>
+
+        <br><br>
+
+        <!-- Flagged Entities Section -->
+        <h2>Flagged Entities</h2>
+        <div class="row">
+            <div class="col-lg-4 mb-4">
+                <canvas id="flaggedInfluencersBarChart"></canvas>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <canvas id="flaggedSponsorsBarChart"></canvas>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <canvas id="flaggedCampaignsBarChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Pie Charts
+            const pieColors = ['#e74a3b', '#4e73df']; // Colors for Pie Charts
+
+            new Chart(document.getElementById('sponsorsPieChart'), {
+                type: 'pie',
+                data: {
+                    labels: ['Flagged', 'Active'],
+                    datasets: [{
+                        data: [{{ flagged_sponsors_count }}, {{ active_sponsors }}],
+                        backgroundColor: pieColors
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        title: { display: true, text: 'Sponsors' }
+                    }
+                }
+            });
+
+            new Chart(document.getElementById('influencersPieChart'), {
+                type: 'pie',
+                data: {
+                    labels: ['Flagged', 'Active'],
+                    datasets: [{
+                        data: [{{ flagged_influencers_count }}, {{ active_influencers }}],
+                        backgroundColor: pieColors
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        title: { display: true, text: 'Influencers' }
+                    }
+                }
+            });
+
+            new Chart(document.getElementById('campaignsPieChart'), {
+                type: 'pie',
+                data: {
+                    labels: ['Flagged', 'Active'],
+                    datasets: [{
+                        data: [{{ flagged_campaigns_count }}, {{ active_campaigns }}],
+                        backgroundColor: pieColors
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        title: { display: true, text: 'Campaigns' }
+                    }
+                }
+            });
+
+            // Bar Charts
+            const barColors = ['#36a2eb', '#4caf50']; // Colors for Bar Charts
+
+            new Chart(document.getElementById('campaignsBarChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Total Campaigns', 'Active Campaigns'],
+                    datasets: [{
+                        data: [{{ total_campaigns }}, {{ active_campaigns }}],
+                        backgroundColor: barColors
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: 'Campaigns Overview' }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            new Chart(document.getElementById('influencersBarChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Total Influencers', 'Active Influencers'],
+                    datasets: [{
+                        data: [{{ total_influencers }}, {{ active_influencers }}],
+                        backgroundColor: barColors
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: 'Influencers Overview' }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            new Chart(document.getElementById('sponsorsBarChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Total Sponsors', 'Active Sponsors'],
+                    datasets: [{
+                        data: [{{ total_sponsors }}, {{ active_sponsors }}],
+                        backgroundColor: barColors
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: 'Sponsors Overview' }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            new Chart(document.getElementById('flaggedInfluencersBarChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Flagged Influencers'],
+                    datasets: [{
+                        data: [{{ flagged_influencers_count }}],
+                        backgroundColor: ['#e74a3b']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: 'Influencers' }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            new Chart(document.getElementById('flaggedSponsorsBarChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Flagged Sponsors'],
+                    datasets: [{
+                        data: [{{ flagged_sponsors_count }}],
+                        backgroundColor: ['#e74a3b']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: 'Sponsors' }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            new Chart(document.getElementById('flaggedCampaignsBarChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Flagged Campaigns'],
+                    datasets: [{
+                        data: [{{ flagged_campaigns_count }}],
+                        backgroundColor: ['#e74a3b']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: 'Campaigns' }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+        });
+    </script>
+</body>
+</html>

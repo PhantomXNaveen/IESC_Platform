@@ -1,0 +1,64 @@
+{% extends 'base_sponsor.html' %}
+{% block content %}
+
+{% for message in get_flashed_messages() %}  
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+  <strong> {{ message }}! </strong>
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+
+<div id="input-form"> 
+    <h2>Campaign </h2>
+    <form action="/campaign" method="POST" >
+        <div class="mb-3">
+          <label for="title" class="form-label"> Title</label>
+          <input type="text" class="form-control" name="title" id="title">
+        </div> 
+        <div class="mb-3">
+          <label for="description" class="form-label">Description</label>
+          <textarea class="form-control" rows="4" name="description" id="description"></textarea>
+        </div>
+        <div class="mb-3">
+          <label for="start_date" class="form-label">Start Date</label>
+          <input type="date" class="form-control" name="start_date" id="start_date">
+        </div>
+        <div class="mb-3">
+          <label for="end_date" class="form-label">End Date</label>
+          <input type="date" class="form-control" name="end_date" id="end_date">
+        </div>
+        <div class="mb-3">
+          <label for="budget" class="form-label">Budget</label>
+          <input type="number" class="form-control" name="budget" id="budget">
+        </div>
+        <div class="mb-3">
+            <label for="visibility" class="form-label">Visibility</label>
+            <select class="form-control" name="visibility" id="visibility">
+                <option value="Public">Public</option>
+                <option value="Private">Private</option>
+            </select>
+        </div>
+        <div class="mb-3">
+          <label for="niche" class="form-label"> Niche </label>
+          <select class="form-control" name="niche" id="niche">
+            <option value="" disabled selected>Select a Niche</option>
+            <option value="Fashion">Fashion</option>
+            <option value="Technology">Technology</option>
+            <option value="Travel">Travel</option>
+            <option value="Food">Food</option>
+            <option value="Fitness">Fitness</option>
+            <option value="Beauty">Beauty</option>
+            <option value="Lifestyle">Lifestyle</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="goal" class="form-label"> Goal</label>
+          <input type="text" class="form-control" name="goal" id="goal">
+        </div>
+        <button type="submit" class="btn btn-primary">Create</button>
+        <br> 
+    </form>
+</div>
+
+{% endblock %}

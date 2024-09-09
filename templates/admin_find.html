@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- External styles -->
+    <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet">
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+    <title>Admin Dashboard - Find</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand">Admin's Dashboard</a>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link " aria-current="page" href="{{ url_for('admin_dashboard') }}">Info</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_find') }}">Find</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_stats') }}">Stats</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                    </li>
+                </ul>
+                <form class="d-flex" method="POST" action="{{ url_for('admin_find') }}">
+                    <select class="form-select me-2" name="type">
+                        <option value="">Select Type</option>
+                        <option value="Influencer">Influencer</option>
+                        <option value="Campaign">Campaign</option>
+                        <option value="Sponsor">Sponsor</option>
+                    </select>
+                    <select class="form-select me-2" name="niche">
+                        <option value="">Select Niche</option>
+                        {% for niche in niches %}
+                            <option value="{{ niche }}">{{ niche }}</option>
+                        {% endfor %}
+                    </select>
+                    <select class="form-select me-2" name="flagged">
+                        <option value="">Flagged Status</option>
+                        {% for option in flagged_options %}
+                            <option value="{{ option }}">{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                    <button class="btn btn-outline-light" type="submit">Filter</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="panel">
+            <table class="table table-striped">
+                <thead>
+                    <tr class="table-primary">
+                        <th scope="col">#</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Name/Title</th>
+                        <th scope="col">Niche</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Influencers -->
+                    {% for influencer in influencers %}
+                    <tr>
+                        <th scope="row">{{ loop.index }}</th>
+                        <td>Influencer</td>
+                        <td>{{ influencer.username }}</td>
+                        <td>{{ influencer.niche }}</td>
+                        <td>
+                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#viewInfluencerModal{{ influencer.id }}">
+                                View
+                            </button>
+                            <form action="{{ url_for('flag_influencer', id=influencer.id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-danger btn-sm">{{ 'Unflag' if influencer.flagged == 'YES' else 'Flag' }}</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <!-- Influencer Modal -->
+                    <div class="modal fade" id="viewInfluencerModal{{ influencer.id }}" tabindex="-1" aria-labelledby="viewInfluencerModalLabel{{ influencer.id }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="viewInfluencerModalLabel{{ influencer.id }}">Influencer: {{ influencer.username }}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p><strong>Name:</strong> {{ influencer.name }}</p>
+                                    <p><strong>Email:</strong> {{ influencer.email }}</p>
+                                    <p><strong>Niche:</strong> {{ influencer.niche }}</p>
+                                    <p><strong>Platform:</strong> {{ influencer.platform }}</p>
+                                    <p><strong>Followers:</strong> {{ influencer.followers }}</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <!-- Campaigns -->
+                    {% for campaign in campaigns %}
+                    <tr>
+                        <th scope="row">{{ loop.index + influencers|length }}</th>
+                        <td>Campaign</td>
+                        <td>{{ campaign.title }}</td>
+                        <td>{{ campaign.niche }}</td>
+                        <td>
+                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#viewCampaignModal{{ campaign.id }}">
+                                View
+                            </button>
+                            <form action="{{ url_for('flag_campaign', id=campaign.id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-danger btn-sm">{{ 'Unflag' if campaign.flagged == 'YES' else 'Flag' }}</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <!-- Campaign Modal -->
+                    <div class="modal fade" id="viewCampaignModal{{ campaign.id }}" tabindex="-1" aria-labelledby="viewCampaignModalLabel{{ campaign.id }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="viewCampaignModalLabel{{ campaign.id }}">Campaign: {{ campaign.title }}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p><strong>Title:</strong> {{ campaign.title }}</p>
+                                    <p><strong>Description:</strong> {{ campaign.description }}</p>
+                                    <p><strong>Budget:</strong> {{ campaign.budget }}</p>
+                                    <p><strong>Start Date:</strong> {{ campaign.start_date }}</p>
+                                    <p><strong>End Date:</strong> {{ campaign.end_date }}</p>
+                                    <p><strong>Goal:</strong> {{ campaign.goal }}</p>
+                                    <p><strong>Niche:</strong> {{ campaign.niche }}</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <!-- Sponsors -->
+                    {% for sponsor in sponsors %}
+                    <tr>
+                        <th scope="row">{{ loop.index + influencers|length + campaigns|length }}</th>
+                        <td>Sponsor</td>
+                        <td>{{ sponsor.username }}</td>
+                        <td>{{ sponsor.industry }}</td>
+                        <td>
+                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#viewSponsorModal{{ sponsor.id }}">
+                                View
+                            </button>
+                            <form action="{{ url_for('flag_sponsor', id=sponsor.id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-danger btn-sm">{{ 'Unflag' if sponsor.flagged == 'YES' else 'Flag' }}</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <!-- Sponsor Modal -->
+                    <div class="modal fade" id="viewSponsorModal{{ sponsor.id }}" tabindex="-1" aria-labelledby="viewSponsorModalLabel{{ sponsor.id }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="viewSponsorModalLabel{{ sponsor.id }}">Sponsor: {{ sponsor.username }}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p><strong>Name:</strong> {{ sponsor.name }}</p>
+                                    <p><strong>Email:</strong> {{ sponsor.email }}</p>
+                                    <p><strong>Industry:</strong> {{ sponsor.industry }}</p>
+                                    <p><strong>Website:</strong> {{ sponsor.website }}</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+</html>

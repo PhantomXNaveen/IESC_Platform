@@ -1,0 +1,133 @@
+{% extends 'base_sponsor.html' %}
+
+{% block content %}
+    <div style="text-align: center; padding: 20px;">
+        <h1>{{ sponsor.username }}'s Stats</h1>
+
+        <h2>Overall Stats</h2>
+        <div style="width: 40%; max-width: 200px; margin: auto;">
+            <canvas id="acceptanceRateChart"></canvas>
+        </div>
+
+        <h2>Campaign Stats</h2>
+        <div style="width: 80%; margin: auto; padding-top: 20px;">
+            <canvas id="campaignsChart"></canvas>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Data for Acceptance Rate Pie Chart
+        const acceptanceRateData = {
+            labels: ['Accepted Ads', 'Pending Ads'],
+            datasets: [{
+                data: [{{ total_accepted }}, {{ total_pending }}],
+                backgroundColor: ['#4e73df', '#e74a3b']
+            }]
+        };
+    
+        const acceptanceRateConfig = {
+            type: 'pie',
+            data: acceptanceRateData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: {
+                                size: 14
+                            }
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Acceptance Rate',
+                        font: {
+                            size: 18,
+                            weight: 'bold'
+                        }
+                    }
+                }
+            },
+        };
+    
+        new Chart(
+            document.getElementById('acceptanceRateChart'),
+            acceptanceRateConfig
+        );
+    
+        // Data for Campaigns Bar Chart
+        const campaignsData = {
+            labels: {{ campaign_names | tojson }},
+            datasets: [
+                {
+                    label: 'Total Ads',
+                    data: {{ total_ads_per_campaign | tojson }},
+                    backgroundColor: '#36a2eb'
+                },
+                {
+                    label: 'Accepted Ads',
+                    data: {{ accepted_ads_per_campaign | tojson }},
+                    backgroundColor: '#4caf50'
+                },
+                {
+                    label: 'Pending Ads',
+                    data: {{ pending_ads_per_campaign | tojson }},
+                    backgroundColor: '#ff6384'
+                }
+            ]
+        };
+    
+        const campaignsConfig = {
+            type: 'bar',
+            data: campaignsData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: {
+                                size: 14
+                            }
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Campaign Performance',
+                        font: {
+                            size: 20,
+                            weight: 'bold'
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            font: {
+                                size: 14
+                            }
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            font: {
+                                size: 14
+                            }
+                        }
+                    }
+                }
+            },
+        };
+    
+        new Chart(
+            document.getElementById('campaignsChart'),
+            campaignsConfig
+        );
+    </script>
+    
+{% endblock %}

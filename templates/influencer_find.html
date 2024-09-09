@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Calling extrernal styles  -->
+    <link  href="{{ url_for('static',filename='styles.css') }}" rel="stylesheet">
+    <!-- Third Party Bootstrap  -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <title> IESC Platform </title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand">Welcome {{ influencer.username }}</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>    
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+    
+              
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('influencer_profile', id=id) }}" >Profile</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link " href="{{url_for('influencer_find')}}">Find</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{{url_for('influencer_stats')}}">Stats</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{{url_for('logout')}}">Logout</a>
+              </li>
+            </ul>   
+                 
+            <form class="d-flex" method="POST" action="{{ url_for('influencer_find') }}">
+                <input class="form-control me-2" type="search" name="search" placeholder="Search Campaigns" aria-label="Search">
+                <select class="form-select me-2" name="niche">
+                    <option value="">Select Niche</option>
+                    {% for niche in niches %}
+                        <option value="{{ niche }}">{{ niche }}</option>
+                    {% endfor %}
+                </select>
+                <button class="btn btn-outline-light" type="submit">Search</button>
+            </form>
+
+            </div>
+        </div>
+      </nav>
+    <br>
+    <div class="container">
+        <div class="panel">
+            <table class="table table-striped">
+                <thead>
+                    <tr class="table-primary">
+                        <th scope="col">Campaign ID</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Niche</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for campaign in campaigns %}
+                    {% if campaign.visibility == "Public" %}
+                    <tr>
+                        <td>{{ campaign.id }}</td>
+                        <td>{{ campaign.title }}</td>
+                        <td>{{ campaign.description }}</td>
+                        <td>{{ campaign.niche }}</td>
+                        <!-- Button trigger modal -->
+                        <td>
+                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#InfoModal_ID{{campaign.id}}">
+                                Info
+                            </button>
+                            <a href="{{ url_for('influencer_request', id=campaign.id) }}" class="btn btn-small btn-success btn-sm">Request</a>
+                            <a href="{{url_for('campaignIn_view', id=campaign.id)}}" class="btn btn-small btn-secondary btn-sm">View</a>
+                        </td>
+                    </tr>
+                    <!-- Modal -->
+                    <div class="modal fade" id="InfoModal_ID{{campaign.id}}" tabindex="-1" aria-labelledby="InfoModal{{campaign.id}}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="InfoModal{{campaign.id}}">{{ campaign.title }}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p><strong>Description :</strong>{{ campaign.description }}</p>
+                                    <p><strong>Budget :</strong>{{ campaign.budget }}</p>
+                                    <p><strong>Start Date :</strong>{{ campaign.start_date }}</p>
+                                    <p><strong>End Date :</strong>{{ campaign.end_date }}</p>
+                                    <p><strong>Goal :</strong>{{ campaign.goal }}</p>
+                                    <p><strong>Niche :</strong>{{ campaign.niche }}</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+        </div>
+    </div>
+</body>
+</html>
+
+

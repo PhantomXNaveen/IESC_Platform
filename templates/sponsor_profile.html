@@ -1,0 +1,230 @@
+{% extends 'base_sponsor.html' %}
+
+{% block content %}
+
+{% for message in get_flashed_messages() %}  
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      {{ message }}	
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endfor %}
+
+
+<div class="container mt-4">
+    <div class="card mb-3">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5>{{ sponsor.name }}</h5>
+        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#EditModal_ID{{ sponsor.id }}">Edit</button>
+      </div>
+      <div class="card-body profile-card">
+        <div class="profile-img mb-3">
+          <img src="{{ url_for('static', filename='img/IESC_img2.jpg') }}" class="card-img-top" alt="Sponsor Image">
+        </div>
+        <div class="profile-content">
+          <div class="row mb-2">
+            <div class="col-auto">
+              <h6 class="card-subtitle mb-0">UserName:</h6>
+            </div>
+            <div class="col">
+              <p class="card-text mb-0">{{ sponsor.username }}</p>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-auto">
+              <h6 class="card-subtitle mb-0">Email:</h6>
+            </div>
+            <div class="col">
+              <p class="card-text mb-0">{{ sponsor.email }}</p>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-auto">
+              <h6 class="card-subtitle mb-0">Industry:</h6>
+            </div>
+            <div class="col">
+              <p class="card-text mb-0">{{ sponsor.industry }}</p>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-auto">
+              <h6 class="card-subtitle mb-0">Budget:</h6>
+            </div>
+            <div class="col">
+              <p class="card-text mb-0">{{ sponsor.budget }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+<div class="container">
+    <h5><strong>Active Campaigns</strong></h5>
+    <table class="table table-striped">
+        <thead>
+            <tr class="table-primary">
+                <th scope="col">Campaign ID</th>
+                <th scope="col">Progress</th>
+                <th scope="col">Title</th>
+                <th scope="col">Description</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for campaign in active_campaigns %}
+                {% if campaign.progress < 100 %}
+
+                <tr>
+                    <td>{{ campaign.id }}</td>
+                    <td>
+                        <div class="progress">
+                          <div class="progress-bar" role="progressbar" style="width: {{ campaign.progress }}%;" aria-valuenow="{{ campaign.progress }}" aria-valuemin="0" aria-valuemax="100">{{ campaign.progress }}%</div>
+                        </div>
+                      </td>
+                    <td>{{ campaign.title }}</td>
+                    <td>{{ campaign.description }}</td>
+                    <td>
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#InfoModal_ID{{ campaign.id }}">Info</button>
+                        <a href="{{ url_for('campaignSp_view', id=campaign.id) }}" class="btn btn-sm btn-success">View</a>  
+                    </td>
+                </tr>
+                <!-- For Campaign Info -->
+                <div class="modal fade" id="InfoModal_ID{{ campaign.id }}" tabindex="-1" aria-labelledby="InfoModal{{ campaign.id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="InfoModal{{ campaign.id }}">{{ campaign.title }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p><strong>Description :</strong> {{ campaign.description }}</p>
+                                <p><strong>Budget :</strong> {{ campaign.budget }}</p>
+                                <p><strong>Start Date :</strong> {{ campaign.start_date }}</p>
+                                <p><strong>End Date :</strong> {{ campaign.end_date }}</p>
+                                <p><strong>Visibility :</strong> {{ campaign.visibility }}</p>
+                                <p><strong>Goal :</strong> {{ campaign.goal }}</p>
+                                <p><strong>Niche :</strong> {{ campaign.niche }}</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<br>
+
+<div class="container">
+    <h5><strong>New Requests</strong></h5>
+    <table class="table table-striped">
+        <thead>
+            <tr class="table-primary">
+                <th scope="col">Ad_request ID</th>
+                <th scope="col">Campaign ID</th>
+                <th scope="col">Influencer ID</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ad_request in ad_requests3 %}
+                
+                <tr>  
+                    <td>{{ ad_request.id }}</td>
+                    <td>{{ ad_request.campaign_id }}</td>
+                    <td>{{ ad_request.influencer_id }}</td>
+                    <td>
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#ReqViewModal_ID{{ ad_request.id }}">Info</button>
+                            <a href="{{ url_for('accept_request', id=ad_request.id) }}" class="btn btn-sm btn-success">Accept</a>
+                            <a href="{{ url_for('reject_request', id=ad_request.id) }}" class="btn btn-sm btn-danger">Reject</a>
+                    </td>
+                </tr> 
+                <!-- For Req View -->
+                <div class="modal fade" id="ReqViewModal_ID{{ ad_request.id }}" tabindex="-1" aria-labelledby="ReqViewModal{{ ad_request.id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="ReqViewModal{{ ad_request.id }}">{{ ad_request.name }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p><strong>Requirements :</strong> {{ ad_request.requirements }}</p>
+                                <p><strong>Payment Amount :</strong> {{ ad_request.payment_amount }}</p>
+                                <p><strong>Message :</strong> 
+                                    {% if ad_request.message %}
+                                        {{ ad_request.message }}
+                                    {% else %}
+                                        <span class="text-muted">No message provided</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>   
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- For Edit Sponsor Modal -->
+<div class="modal fade" id="EditModal_ID{{ sponsor.id }}" tabindex="-1" aria-labelledby="EditModal{{ sponsor.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="EditModal{{ sponsor.id }}">Edit {{ sponsor.username }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('edit_sponsor', id=sponsor.id) }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">UserName</label>
+                        <input type="text" class="form-control" id="username" name="username" value="{{ sponsor.username }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="name" name="name" value="{{ sponsor.name }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ sponsor.email }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="industry" class="form-label">Industry</label>
+                        <select class="form-control" name="industry" id="industry" value="{{ sponsor.industry }}">
+                            <option value="Other">Other</option>
+                            <option value="Fashion">Fashion</option>
+                            <option value="Technology">Technology</option>
+                            <option value="Travel">Travel</option>
+                            <option value="Food">Food</option>
+                            <option value="Fitness">Fitness</option>
+                            <option value="Beauty">Beauty</option>
+                            <option value="Lifestyle">Lifestyle</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="budget" class="form-label">Budget</label>
+                        <input type="number" class="form-control" name="budget" id="budget" value="{{ sponsor.budget }}">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}
